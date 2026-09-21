@@ -1,11 +1,10 @@
-
 <!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="DELTA The Laurel class list random student picker.">
-  <meta name="application-version" content="1.11">
+  <meta name="application-version" content="1.12">
   <meta name="theme-color" content="#283485">
   <title>DELTA Random Name Generator</title>
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%23ffffff'/%3E%3Cpath d='M8 49 30 10l23 39H38L30 34 22 49z' fill='%23283485'/%3E%3Cpath d='m8 49 22-39 8 14-14 25z' fill='%23ffb719'/%3E%3Cpath d='M22 49h16l-8-15z' fill='%23970031'/%3E%3C/svg%3E">
@@ -219,6 +218,8 @@
     .result-wrap > div { transform: translateY(var(--result-offset, 0px)); }
 
     .result-label { margin: 0 0 14px; color: var(--muted); font-size: .8rem; font-weight: 850; letter-spacing: .13em; text-transform: uppercase; }
+    
+    /* ADDED: is-rolling animation class for rapid slot machine text */
     .student-name {
       margin: 0;
       max-width: 700px;
@@ -229,8 +230,10 @@
       overflow-wrap: anywhere;
       text-wrap: balance;
     }
-
+    
+    .student-name.is-rolling { opacity: 0.8; transform: scale(0.98); }
     .student-name.is-new { animation: reveal .55s cubic-bezier(.2, .8, .2, 1); }
+    
     .result-label.is-bonus { color: var(--coral); font-size: clamp(1rem, 2vw, 1.3rem); letter-spacing: .04em; text-transform: none; animation: bonus-pop .85s cubic-bezier(.16, 1.35, .35, 1); }
     .result-wrap.is-bonus { animation: bonus-glow 1.15s ease-out; }
 
@@ -296,8 +299,8 @@
       transition: transform .18s ease, box-shadow .18s ease, background .18s ease;
     }
 
-    .pick-button:hover { transform: translateY(-2px); box-shadow: 0 16px 34px rgba(40, 52, 133, .26); background: var(--ink); }
-    .pick-button:active { transform: translateY(0); }
+    .pick-button:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 16px 34px rgba(40, 52, 133, .26); background: var(--ink); }
+    .pick-button:active:not(:disabled) { transform: translateY(0); }
 
     .floating-pick-button {
       position: fixed;
@@ -311,8 +314,8 @@
       transform: translateX(-50%);
     }
 
-    .floating-pick-button:hover { transform: translateX(-50%) translateY(-2px); }
-    .floating-pick-button:active { transform: translateX(-50%); }
+    .floating-pick-button:hover:not(:disabled) { transform: translateX(-50%) translateY(-2px); }
+    .floating-pick-button:active:not(:disabled) { transform: translateX(-50%); }
     .floating-pick-button[hidden] { display: none; }
     .pick-button.floating-pick-button:disabled { transform: translateX(-50%); }
     body.has-floating-picker .shell { padding-bottom: 124px; }
@@ -352,10 +355,11 @@
     .add-student-button:disabled { opacity: .4; cursor: not-allowed; }
     .add-student-status { min-height: 1em; margin: 5px 2px 0; color: rgba(255,255,255,.62); font-size: .66rem; }
 
+    /* MODIFIED: Roster spacing adjusted for density */
     .roster-list {
       display: grid;
-      gap: 2px;
-      margin: 24px -10px 0;
+      gap: 1px; /* Tighter gap */
+      margin: 16px -10px 0;
       padding: 0 10px 8px;
       overflow: auto;
       scrollbar-color: rgba(255,255,255,.25) transparent;
@@ -366,23 +370,23 @@
     .roster-item {
       display: flex;
       align-items: center;
-      gap: 11px;
+      gap: 9px;
       width: 100%;
-      min-height: 42px;
-      padding: 7px 9px;
+      min-height: 30px; /* Reduced from 42px */
+      padding: 4px 9px; /* Reduced from 7px 9px */
       border: 0;
-      border-radius: 10px;
+      border-radius: 8px;
       background: transparent;
       color: rgba(255,255,255,.78);
-      font-size: .9rem;
+      font-size: .85rem; /* Slightly smaller text */
       text-align: left;
       cursor: pointer;
-      transition: background .16s ease, color .16s ease, opacity .16s ease, transform .16s ease;
+      transition: background .12s ease, color .12s ease, opacity .12s ease, transform .12s ease;
     }
 
     .roster-item:hover { background: rgba(255,255,255,.09); color: var(--white); transform: translateX(2px); }
     .roster-item:focus-visible { outline: 3px solid var(--yellow); outline-offset: 1px; }
-    .roster-item.is-picked { background: rgba(151, 0, 49, .72); color: var(--white); }
+    .roster-item.is-picked { background: rgba(151, 0, 49, .85); color: var(--white); font-weight: 700; }
     .roster-item.is-boosted { background: #2f72c8; color: var(--white); }
     .roster-item.is-boosted:hover { background: #3c82db; }
     .roster-item.is-boosted.is-picked { box-shadow: inset 0 0 0 2px var(--yellow); }
@@ -391,11 +395,12 @@
     .roster-item.is-boosted5.is-picked { box-shadow: inset 0 0 0 2px var(--yellow); }
     .roster-item.is-excluded { background: #b42318; color: var(--white); text-decoration: line-through; opacity: .88; }
     .roster-item.is-excluded:hover { background: #d13a2f; opacity: 1; }
-    .number { display: grid; place-items: center; flex: 0 0 25px; width: 25px; height: 25px; border-radius: 50%; background: rgba(255,255,255,.09); color: rgba(255,255,255,.52); font-size: .7rem; font-weight: 800; }
+    
+    .number { display: grid; place-items: center; flex: 0 0 22px; width: 22px; height: 22px; border-radius: 50%; background: rgba(255,255,255,.09); color: rgba(255,255,255,.52); font-size: .65rem; font-weight: 800; }
     .roster-item.is-picked .number { background: var(--yellow); color: var(--ink); }
     .roster-item.is-excluded .number { background: rgba(255,255,255,.08); color: rgba(255,255,255,.42); }
     .roster-name { min-width: 0; flex: 1; overflow-wrap: anywhere; }
-    .state-badge { flex: 0 0 auto; padding: 3px 6px; border-radius: 99px; background: rgba(255,255,255,.16); color: inherit; font-size: .62rem; font-weight: 900; letter-spacing: .04em; text-decoration: none; text-transform: uppercase; }
+    .state-badge { flex: 0 0 auto; padding: 2px 5px; border-radius: 99px; background: rgba(255,255,255,.16); color: inherit; font-size: .6rem; font-weight: 900; letter-spacing: .04em; text-decoration: none; text-transform: uppercase; }
     .pick-button:disabled { background: #8f94a6; box-shadow: none; cursor: not-allowed; transform: none; }
 
     .error {
@@ -517,7 +522,7 @@
       </aside>
     </section>
     <footer class="site-footer">
-      <span class="footer-version">Version 1.11</span>
+      <span class="footer-version">Version 1.12</span>
       <span>Another resource from our chatty friend</span>
     </footer>
     <button class="pick-button floating-pick-button" id="floating-pick-button" type="button" hidden>
@@ -557,6 +562,8 @@
       let lastIndex = -1;
       let namesUntilBonus = randomBonusGap();
       let layoutFrame = 0;
+      let isPicking = false;
+      const STORAGE_KEY = 'deltaRandomPickerState';
 
       function randomBonusGap() {
         return 10 + Math.floor(Math.random() * 11);
@@ -583,6 +590,49 @@
 
       function setPickButtonDisabled(disabled) {
         floatingPickButton.disabled = disabled;
+      }
+
+      // ADDED: State persistence
+      function saveState() {
+        if (!students.length) {
+          localStorage.removeItem(STORAGE_KEY);
+          return;
+        }
+        const data = {
+          label: classHeading.textContent,
+          isManual: classLabel.textContent === 'Manual class',
+          students,
+          studentStates,
+          namesUntilBonus,
+          lastIndex
+        };
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+      }
+
+      function loadState() {
+        try {
+          const raw = localStorage.getItem(STORAGE_KEY);
+          if (!raw) return false;
+          
+          const data = JSON.parse(raw);
+          if (data && data.students && data.students.length > 0) {
+            students = data.students;
+            studentStates = data.studentStates || students.map(() => 'normal');
+            namesUntilBonus = data.namesUntilBonus ?? randomBonusGap();
+            lastIndex = data.lastIndex ?? -1;
+            
+            setupPickerUI(data.label || 'Saved Class', data.isManual);
+            if (lastIndex >= 0 && lastIndex < students.length) {
+                studentName.textContent = students[lastIndex];
+                resultLabel.textContent = 'Last selected student';
+                setPickButtonLabel('Pick another');
+            }
+            return true;
+          }
+        } catch (e) {
+          console.warn("Could not load saved random picker state.");
+        }
+        return false;
       }
 
       function fitClassHeading() {
@@ -687,7 +737,7 @@
       }
 
       function showBonusQuestion(studentIndex) {
-        studentName.classList.remove('is-new');
+        studentName.classList.remove('is-new', 'is-rolling');
         resultLabel.classList.remove('is-bonus');
         resultWrap.classList.remove('is-bonus');
         bonusBurst.replaceChildren();
@@ -778,33 +828,57 @@
         if (studentStates[index] === 'excluded' && lastIndex === index) lastIndex = -1;
         renderRoster(lastIndex);
         updatePickerAvailability();
+        saveState();
       }
 
       function resetAllStudents() {
         studentStates = students.map(() => 'normal');
         renderRoster(lastIndex);
         updatePickerAvailability();
+        saveState();
       }
 
-      function openManualClass() {
+      // Shared function to set up UI regardless of data source (file, manual, or storage)
+      function setupPickerUI(labelTitle, isManual = false) {
         clearError();
-        lastIndex = -1;
-        namesUntilBonus = randomBonusGap();
-        classLabel.textContent = 'Manual class';
-        classHeading.textContent = 'Custom class';
+        classLabel.textContent = isManual ? 'Manual class' : 'Class loaded';
+        classHeading.textContent = labelTitle;
         bonusBurst.replaceChildren();
         resultWrap.classList.remove('is-bonus');
         resultLabel.classList.remove('is-bonus');
-        resultLabel.textContent = 'Ready to choose';
-        studentName.textContent = 'Everyone';
-        studentName.classList.remove('is-new');
-        setPickButtonLabel('Pick a student');
+        
+        if (lastIndex === -1) {
+            resultLabel.textContent = 'Ready to choose';
+            studentName.textContent = 'Everyone';
+            studentName.classList.remove('is-new');
+            setPickButtonLabel('Pick a student');
+        }
+        
         floatingPickButton.hidden = false;
         document.body.classList.add('has-floating-picker');
+        uploadText.textContent = isManual ? 'Import class' : 'Change class';
+        
+        updateStudentCount();
+        addStudentInput.value = '';
+        addStudentInput.disabled = false;
+        addStudentButton.disabled = false;
+        addStudentStatus.textContent = '';
+        
         rosterEmpty.hidden = true;
         emptyView.hidden = true;
         pickerView.hidden = false;
-        document.title = 'Custom class · DELTA Random Name Generator';
+        
+        renderRoster(lastIndex);
+        updatePickerAvailability();
+        schedulePickerLayout();
+        document.title = `${labelTitle} · DELTA Random Name Generator`;
+      }
+
+      function openManualClass() {
+        lastIndex = -1;
+        namesUntilBonus = randomBonusGap();
+        setupPickerUI('Custom class', true);
+        saveState();
       }
 
       function addStudentByHand(event) {
@@ -821,12 +895,14 @@
         students.push(name);
         studentStates.push('normal');
         if (isFirstStudent) openManualClass();
+        
         addStudentInput.value = '';
         addStudentStatus.textContent = `${name} added.`;
         updateStudentCount();
         renderRoster(lastIndex);
         updatePickerAvailability();
         schedulePickerLayout();
+        saveState();
         addStudentInput.focus();
       }
 
@@ -845,35 +921,13 @@
           return;
         }
 
-        clearError();
         students = names;
         studentStates = names.map(() => 'normal');
         lastIndex = -1;
         namesUntilBonus = randomBonusGap();
-        classLabel.textContent = 'Class loaded';
-        classHeading.textContent = label;
-        bonusBurst.replaceChildren();
-        resultWrap.classList.remove('is-bonus');
-        studentName.textContent = 'Everyone';
-        studentName.classList.remove('is-new');
-        resultLabel.classList.remove('is-bonus');
-        resultLabel.textContent = 'Ready to choose';
-        setPickButtonLabel('Pick a student');
-        floatingPickButton.hidden = false;
-        document.body.classList.add('has-floating-picker');
-        uploadText.textContent = 'Change class';
-        updateStudentCount();
-        addStudentInput.value = '';
-        addStudentInput.disabled = false;
-        addStudentButton.disabled = false;
-        addStudentStatus.textContent = '';
-        rosterEmpty.hidden = true;
-        emptyView.hidden = true;
-        pickerView.hidden = false;
-        renderRoster();
-        updatePickerAvailability();
-        schedulePickerLayout();
-        document.title = `${label} · DELTA Random Name Generator`;
+        
+        setupPickerUI(label, false);
+        saveState();
       }
 
       function readFile(file) {
@@ -903,10 +957,51 @@
         return pool[Math.floor(Math.random() * pool.length)];
       }
 
+      // ADDED: Roulette visual effect
       function pickStudent() {
-        if (!students.length) return;
-        const nextIndex = chooseIndex();
-        if (nextIndex < 0) return;
+        if (isPicking || !students.length) return;
+        const finalIndex = chooseIndex();
+        if (finalIndex < 0) return;
+
+        isPicking = true;
+        setPickButtonDisabled(true);
+        resultWrap.classList.remove('is-bonus');
+        resultLabel.classList.remove('is-bonus');
+        studentName.classList.remove('is-new');
+        studentName.classList.add('is-rolling');
+        resultLabel.textContent = 'Selecting...';
+
+        const availableIndices = students.map((_, i) => i).filter(i => studentStates[i] !== 'excluded');
+        
+        let ticks = 0;
+        const maxTicks = 12; // Controls duration of spin (12 * 50ms = 600ms)
+
+        const spinInterval = setInterval(() => {
+          ticks++;
+          
+          // Show random flashing names during spin
+          const randomIndex = availableIndices[Math.floor(Math.random() * availableIndices.length)];
+          studentName.textContent = students[randomIndex];
+          
+          // Flash selection in the roster
+          const prevPicked = rosterList.querySelector('.is-picked');
+          if (prevPicked) prevPicked.classList.remove('is-picked');
+          const row = rosterList.children[randomIndex];
+          if (row) {
+              row.classList.add('is-picked');
+              row.scrollIntoView({ block: 'nearest', behavior: 'auto' });
+          }
+
+          if (ticks >= maxTicks) {
+            clearInterval(spinInterval);
+            finalizePick(finalIndex);
+          }
+        }, 50);
+      }
+
+      function finalizePick(nextIndex) {
+        isPicking = false;
+        studentName.classList.remove('is-rolling');
         lastIndex = nextIndex;
 
         if (namesUntilBonus <= 0) {
@@ -918,7 +1013,7 @@
           resultWrap.classList.remove('is-bonus');
           resultLabel.classList.remove('is-bonus');
           studentName.classList.remove('is-new');
-          void studentName.offsetWidth;
+          void studentName.offsetWidth; // trigger reflow
           studentName.textContent = students[nextIndex];
           studentName.classList.add('is-new');
           resultLabel.textContent = 'Selected student';
@@ -927,10 +1022,14 @@
 
         renderRoster(nextIndex);
         schedulePickerLayout();
+        saveState();
+        
         const pickedRow = rosterList.children[nextIndex];
         if (pickedRow) pickedRow.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+        updatePickerAvailability();
       }
 
+      // Initialize
       fileInput.addEventListener('change', event => readFile(event.target.files[0]));
       floatingPickButton.addEventListener('click', pickStudent);
       addStudentForm.addEventListener('submit', addStudentByHand);
@@ -941,6 +1040,7 @@
       }
       resetButton.addEventListener('click', resetAllStudents);
       rosterList.addEventListener('click', event => {
+        if (isPicking) return; // Prevent changing states mid-spin
         const row = event.target.closest('.roster-item');
         if (!row) return;
         cycleStudentState(Number(row.dataset.index));
@@ -963,6 +1063,10 @@
       }));
       dropZone.addEventListener('drop', event => readFile(event.dataTransfer.files[0]));
 
+      // Try loading saved state on startup
+      loadState();
+
+      // Tool registration (optional block)
       const modelContext = document.modelContext;
       if (modelContext?.registerTool) {
         try {
@@ -973,6 +1077,7 @@
             inputSchema: { type: 'object', properties: {}, additionalProperties: false },
             annotations: { readOnlyHint: false, untrustedContentHint: false },
             execute() {
+              if (isPicking) throw new Error('A spin is already in progress.');
               if (!students.length) throw new Error('Import a class text file before choosing a student.');
               if (!studentStates.some(state => state !== 'excluded')) throw new Error('Enable at least one student before choosing.');
               pickStudent();
