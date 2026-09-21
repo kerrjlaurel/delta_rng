@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="DELTA The Laurel class list random student picker.">
-  <meta name="application-version" content="1.12">
+  <meta name="application-version" content="1.13">
   <meta name="theme-color" content="#283485">
   <title>DELTA Random Name Generator</title>
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%23ffffff'/%3E%3Cpath d='M8 49 30 10l23 39H38L30 34 22 49z' fill='%23283485'/%3E%3Cpath d='m8 49 22-39 8 14-14 25z' fill='%23ffb719'/%3E%3Cpath d='M22 49h16l-8-15z' fill='%23970031'/%3E%3C/svg%3E">
@@ -219,7 +219,6 @@
 
     .result-label { margin: 0 0 14px; color: var(--muted); font-size: .8rem; font-weight: 850; letter-spacing: .13em; text-transform: uppercase; }
     
-    /* ADDED: is-rolling animation class for rapid slot machine text */
     .student-name {
       margin: 0;
       max-width: 700px;
@@ -324,7 +323,7 @@
       display: flex;
       flex-direction: column;
       min-width: 0;
-      padding: 28px;
+      padding: 24px 28px;
       border-left: 1px solid var(--line);
       background: var(--ink);
       color: var(--white);
@@ -355,10 +354,11 @@
     .add-student-button:disabled { opacity: .4; cursor: not-allowed; }
     .add-student-status { min-height: 1em; margin: 5px 2px 0; color: rgba(255,255,255,.62); font-size: .66rem; }
 
-    /* MODIFIED: Roster spacing adjusted for density */
+    /* Ultra-compact single spacing */
     .roster-list {
-      display: grid;
-      gap: 1px; /* Tighter gap */
+      display: flex;
+      flex-direction: column;
+      gap: 0;
       margin: 16px -10px 0;
       padding: 0 10px 8px;
       overflow: auto;
@@ -370,15 +370,15 @@
     .roster-item {
       display: flex;
       align-items: center;
-      gap: 9px;
+      gap: 8px;
       width: 100%;
-      min-height: 30px; /* Reduced from 42px */
-      padding: 4px 9px; /* Reduced from 7px 9px */
+      min-height: 24px; /* Shrunk from 30px */
+      padding: 2px 6px; /* Tighter internal padding */
       border: 0;
-      border-radius: 8px;
+      border-radius: 6px;
       background: transparent;
-      color: rgba(255,255,255,.78);
-      font-size: .85rem; /* Slightly smaller text */
+      color: rgba(255,255,255,.85); /* Slightly brighter for contrast */
+      font-size: .8rem;
       text-align: left;
       cursor: pointer;
       transition: background .12s ease, color .12s ease, opacity .12s ease, transform .12s ease;
@@ -396,11 +396,19 @@
     .roster-item.is-excluded { background: #b42318; color: var(--white); text-decoration: line-through; opacity: .88; }
     .roster-item.is-excluded:hover { background: #d13a2f; opacity: 1; }
     
-    .number { display: grid; place-items: center; flex: 0 0 22px; width: 22px; height: 22px; border-radius: 50%; background: rgba(255,255,255,.09); color: rgba(255,255,255,.52); font-size: .65rem; font-weight: 800; }
+    .number { 
+      display: grid; place-items: center; flex: 0 0 18px; width: 18px; height: 18px; 
+      border-radius: 50%; background: rgba(255,255,255,.09); color: rgba(255,255,255,.6); 
+      font-size: .55rem; font-weight: 800; 
+    }
     .roster-item.is-picked .number { background: var(--yellow); color: var(--ink); }
     .roster-item.is-excluded .number { background: rgba(255,255,255,.08); color: rgba(255,255,255,.42); }
     .roster-name { min-width: 0; flex: 1; overflow-wrap: anywhere; }
-    .state-badge { flex: 0 0 auto; padding: 2px 5px; border-radius: 99px; background: rgba(255,255,255,.16); color: inherit; font-size: .6rem; font-weight: 900; letter-spacing: .04em; text-decoration: none; text-transform: uppercase; }
+    .state-badge { 
+      flex: 0 0 auto; padding: 1px 4px; border-radius: 99px; background: rgba(255,255,255,.16); 
+      color: inherit; font-size: .55rem; font-weight: 900; letter-spacing: .04em; text-decoration: none; text-transform: uppercase; 
+    }
+    
     .pick-button:disabled { background: #8f94a6; box-shadow: none; cursor: not-allowed; transform: none; }
 
     .error {
@@ -522,7 +530,7 @@
       </aside>
     </section>
     <footer class="site-footer">
-      <span class="footer-version">Version 1.12</span>
+      <span class="footer-version">Version 1.13</span>
       <span>Another resource from our chatty friend</span>
     </footer>
     <button class="pick-button floating-pick-button" id="floating-pick-button" type="button" hidden>
@@ -592,7 +600,6 @@
         floatingPickButton.disabled = disabled;
       }
 
-      // ADDED: State persistence
       function saveState() {
         if (!students.length) {
           localStorage.removeItem(STORAGE_KEY);
@@ -732,7 +739,6 @@
 
           window.setTimeout(() => void audio.close(), 1900);
         } catch (_) {
-          // Audio is optional and may be blocked by the browser.
         }
       }
 
@@ -838,7 +844,6 @@
         saveState();
       }
 
-      // Shared function to set up UI regardless of data source (file, manual, or storage)
       function setupPickerUI(labelTitle, isManual = false) {
         clearError();
         classLabel.textContent = isManual ? 'Manual class' : 'Class loaded';
@@ -957,7 +962,6 @@
         return pool[Math.floor(Math.random() * pool.length)];
       }
 
-      // ADDED: Roulette visual effect
       function pickStudent() {
         if (isPicking || !students.length) return;
         const finalIndex = chooseIndex();
@@ -974,16 +978,14 @@
         const availableIndices = students.map((_, i) => i).filter(i => studentStates[i] !== 'excluded');
         
         let ticks = 0;
-        const maxTicks = 12; // Controls duration of spin (12 * 50ms = 600ms)
+        const maxTicks = 12;
 
         const spinInterval = setInterval(() => {
           ticks++;
           
-          // Show random flashing names during spin
           const randomIndex = availableIndices[Math.floor(Math.random() * availableIndices.length)];
           studentName.textContent = students[randomIndex];
           
-          // Flash selection in the roster
           const prevPicked = rosterList.querySelector('.is-picked');
           if (prevPicked) prevPicked.classList.remove('is-picked');
           const row = rosterList.children[randomIndex];
@@ -1013,7 +1015,7 @@
           resultWrap.classList.remove('is-bonus');
           resultLabel.classList.remove('is-bonus');
           studentName.classList.remove('is-new');
-          void studentName.offsetWidth; // trigger reflow
+          void studentName.offsetWidth; 
           studentName.textContent = students[nextIndex];
           studentName.classList.add('is-new');
           resultLabel.textContent = 'Selected student';
@@ -1029,7 +1031,6 @@
         updatePickerAvailability();
       }
 
-      // Initialize
       fileInput.addEventListener('change', event => readFile(event.target.files[0]));
       floatingPickButton.addEventListener('click', pickStudent);
       addStudentForm.addEventListener('submit', addStudentByHand);
@@ -1040,7 +1041,7 @@
       }
       resetButton.addEventListener('click', resetAllStudents);
       rosterList.addEventListener('click', event => {
-        if (isPicking) return; // Prevent changing states mid-spin
+        if (isPicking) return; 
         const row = event.target.closest('.roster-item');
         if (!row) return;
         cycleStudentState(Number(row.dataset.index));
@@ -1063,10 +1064,8 @@
       }));
       dropZone.addEventListener('drop', event => readFile(event.dataTransfer.files[0]));
 
-      // Try loading saved state on startup
       loadState();
 
-      // Tool registration (optional block)
       const modelContext = document.modelContext;
       if (modelContext?.registerTool) {
         try {
@@ -1084,9 +1083,7 @@
               return { classLabel: classHeading.textContent, student: studentName.textContent };
             }
           })).catch(() => {});
-        } catch (_) {
-          // The browser does not support WebMCP registration.
-        }
+        } catch (_) {}
       }
     })();
   </script>
